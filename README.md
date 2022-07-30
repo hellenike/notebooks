@@ -8,8 +8,16 @@ In F22, these will be hosted at `shot.holycross.edu/hellenike` (*not yet availab
 
 ## Contents of the repository
 
-The `pluto` directory hosts [Pluto](https://github.com/fonsp/Pluto.jl) notebooks.
+The `pluto` directory hosts [Pluto](https://github.com/fonsp/Pluto.jl) notebooks.  The easiest way to run all of them locally is to use PlutoSliderServer.  From a Julia terminal in this directory:
 
+```julia
+using PlutoSliderServer
+PlutoSliderServer.run_git_repository(joinpath(pwd(), "pluto"))
+```
+
+You can of course also open any individual notebook directly in a locally running Pluto if you prefer.  
+
+> *Note that links in the* `index.jl` *notebook are for use with PlutoSliderServer only*.
 
 
 
