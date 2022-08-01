@@ -41,7 +41,10 @@ vocabpairs = sort(map(cols -> (cols[1], cols[end]), datalines), by = pr -> pr[2]
 english = append!([""], map(pr -> pr[2], vocabpairs))
 
 # ╔═╡ f2962f76-d187-41de-91b9-5137f6c65d51
-englishselector = 	@bind englishopt confirm(Select(english));
+englishselector = 	begin
+	newrand
+	@bind englishopt Select(english, default = "")
+end;
 
 # ╔═╡ 8e175f03-1018-4c79-8f45-0eb7f088280d
 englishindex = findfirst(s -> s == englishopt, english)
@@ -60,7 +63,13 @@ success = greekindex == englishindex
 
 # ╔═╡ 6504258f-6950-4ba1-914e-a4c7aa433be6
 function feedback()
-	success ? md"✅" : md"❌"
+	if isempty(englishopt)
+		html"""
+		<span style="color:silver;">Choose the best definition</span>
+		"""
+	else
+		success ? md"✅" : md"❌"
+	end
 end
 
 # ╔═╡ 0b0f37b2-11c4-11ed-3b71-e71460f9ad67
@@ -70,20 +79,22 @@ PlutoUI.ExperimentalLayout.Div([
 ## Match English definition to Greek verb
 """,
 
-md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 vocabulary list.  Pick the best match from the list of English definitions, and then `Submit`.	
+md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 vocabulary list, then pick the best match from the list of English definitions.
 """,
 
 	html"""<br/><br/>""",
 
 	PlutoUI.ExperimentalLayout.flex([
-	nextbutton,	md"""**$(greek[greekindex])**"""
+	nextbutton,	md"""**$(greek[greekindex])**  """,
+
 	]),
 
 	PlutoUI.ExperimentalLayout.flex([
-	md"""*Choose the best definition*""",
-		englishselector
+			
+		englishselector, 			feedback()
+
 	]),
-	feedback()
+	
 	
 ])
 
