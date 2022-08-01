@@ -17,35 +17,57 @@ end
 # ╔═╡ 45bbc382-31c9-4751-a5dc-e31ae2b63917
 begin
 	using PlutoUI
+	using Unicode
 
 	md"""*Unhide this cell to see or modify your Julia environment*."""
 end
+
+# ╔═╡ b07160b0-fcff-45e6-a5d9-2a8b8ea3dfc9
+html"""
+<br/><br/><br/>
+"""
 
 # ╔═╡ 9242e13a-0bd3-4529-a0b9-ffbbdcc70509
 md"""!!! note "Interface widgets"
 """
 
+# ╔═╡ 46eeacf0-6b01-4a29-9919-000eb7a597b8
+newbutton = @bind newverb Button("Choose a verb");
+
 # ╔═╡ 39cce03d-5ad5-4805-8311-5109f8f224b7
 personselector = @bind person Select(["third"]);
 
 # ╔═╡ a1a83933-f993-490e-8f6e-b8ac2b26cc84
-numselector = @bind num Select(["", "singular", "plural"]);
+numselector = begin
+	newverb
+	@bind num Select(["", "singular", "plural"])
+end;
+
 
 # ╔═╡ d6d27127-d52d-4fae-a832-5b09c6af6669
-tenseselector = @bind tense Select(["", "aorist", "imperfect"]);
+tenseselector = begin
+	newverb
+	@bind tense Select(["", "aorist", "imperfect"]);
+end;
 
 # ╔═╡ ede332a2-34c8-4481-8206-d92a60e4cea0
 moodselector = @bind mood Select(["indicative"]);
 
 # ╔═╡ b3c9f963-bc54-4dcf-aa8a-e66f7894fe75
-voiceselector = @bind voice Select(["", "active", "middle or passive", "middle", "passive", ]);
+voiceselector = begin
+	newverb
+	@bind voice Select(["", "active", "middle or passive", "middle", "passive", ])
+end;
 
-# ╔═╡ 6c3344d5-235b-4fad-982d-049833da6f04
-function evalreply()
+# ╔═╡ d9e59d74-58df-4438-8459-60eba2371ccc
+"""Compose markdown prompt on incomplete entry"""
+function promptreply()
 	if isempty(num) || isempty(tense) || isempty(voice)
-		md""
+		html"""
+		<span style="color:silver;">Choose person, number, tense, mood and voice</span>
+		"""
 	else
-		"Hmm"
+		md""
 	end
 end
 
@@ -56,25 +78,58 @@ md"""!!! note "Data"
 # ╔═╡ 2f25dd81-6f31-401a-a926-620b7aa490fb
 verbdata = readlines("verbforms.csv")[2:end]
 
+# ╔═╡ 59caea6d-761a-40e3-a6a8-c9f1fbd9a32e
+datatable = split.(verbdata, ",")
+
 # ╔═╡ 041c6946-f2d9-423b-a9a3-8e19d90a3771
 verbchoices = map(verbdata) do row
 	split(row,",")[1]
 end
 
-# ╔═╡ f64e47c3-adca-404d-8165-48df97279ea9
-verbselector = @bind verb Select(verbchoices);
+# ╔═╡ 1dbb1728-2610-40fd-9a4f-1e4b536c4da0
+verb = begin
+	newverb
+	rand(verbchoices)
+end
+
+# ╔═╡ 6c3344d5-235b-4fad-982d-049833da6f04
+"""Compose markdown reply to user entry"""
+function evalreply()
+	if isempty(num) || isempty(tense) || isempty(voice)
+		md""
+	else
+		answeridx = findfirst(cols -> cols[1] == verb, datatable)
+		answer = datatable[answeridx]
+		success = answer[2] == person && 
+		answer[3]  == num &&
+		answer[4] == tense && 
+		answer[5] == mood && 
+		answer[6] == voice
+
+		success ? md"✅" : md"❌"
+	end
+end
 
 # ╔═╡ ff634376-102a-11ed-375a-a1bb22719a13
 begin
 	PlutoUI.ExperimentalLayout.Div([
 		md"""# Identifying verb forms
 
-*Choose a verb from the list and fully identify its form with person, number, tense, mood and voice* (`pntmv`)""",
-		
-		PlutoUI.ExperimentalLayout.flex([verbselector, md" p: ", personselector,
-			md" n: ", numselector, md" t: ", tenseselector, md" m: ", moodselector, md" v: ", voiceselector
+> Use the `Choose a verb` button to select a verb form at random from vocabularyin Module 1, then fully identify its form with person, number, tense, mood and voice (`pntmv`)""",
+		html"""
+		<br/>
+		""",
+
+		PlutoUI.ExperimentalLayout.flex([
+			newbutton, 
+			md"**$(verb)**"
 		]),
-		evalreply()
+		
+		PlutoUI.ExperimentalLayout.flex([md" p: ", personselector,
+			md" n: ", numselector, md" t: ", tenseselector, md" m: ", moodselector, md" v: ", voiceselector, evalreply()
+		]),
+		promptreply()
+
 	])
 end
 
@@ -84,6 +139,7 @@ end
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [compat]
 PlutoUI = "~0.7.39"
@@ -303,16 +359,20 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─ff634376-102a-11ed-375a-a1bb22719a13
+# ╟─b07160b0-fcff-45e6-a5d9-2a8b8ea3dfc9
 # ╟─9242e13a-0bd3-4529-a0b9-ffbbdcc70509
+# ╠═46eeacf0-6b01-4a29-9919-000eb7a597b8
+# ╟─1dbb1728-2610-40fd-9a4f-1e4b536c4da0
 # ╟─6c3344d5-235b-4fad-982d-049833da6f04
-# ╠═f64e47c3-adca-404d-8165-48df97279ea9
+# ╟─d9e59d74-58df-4438-8459-60eba2371ccc
 # ╠═39cce03d-5ad5-4805-8311-5109f8f224b7
 # ╠═a1a83933-f993-490e-8f6e-b8ac2b26cc84
 # ╠═d6d27127-d52d-4fae-a832-5b09c6af6669
 # ╠═ede332a2-34c8-4481-8206-d92a60e4cea0
 # ╠═b3c9f963-bc54-4dcf-aa8a-e66f7894fe75
 # ╟─749af000-c8ee-49e2-b228-6a83be13e1dc
-# ╠═2f25dd81-6f31-401a-a926-620b7aa490fb
+# ╟─2f25dd81-6f31-401a-a926-620b7aa490fb
+# ╟─59caea6d-761a-40e3-a6a8-c9f1fbd9a32e
 # ╟─041c6946-f2d9-423b-a9a3-8e19d90a3771
 # ╟─45bbc382-31c9-4751-a5dc-e31ae2b63917
 # ╟─00000000-0000-0000-0000-000000000001
