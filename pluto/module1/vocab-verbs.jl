@@ -17,15 +17,21 @@ end
 # ╔═╡ 405550c6-970d-4855-97c8-5b0f039f6e95
 using PlutoUI
 
+# ╔═╡ 1ff3e5c3-c1fa-4ec3-b5dc-a3d247db23bb
+html"""
+
+<br/><br/><br/>
+"""
+
 # ╔═╡ 6b2937b1-9f46-4fbd-9253-74e5c17fb691
-md"""!!! note "UI"
+md"""!!! note "UI for verb forms"
 """
 
 # ╔═╡ 61d42adc-5347-47e8-9faf-f707f0485c7d
 nextbutton = @bind newrand Button("Choose verb");
 
 # ╔═╡ 50f28b04-44fc-4483-a47a-9d6cf092ce7c
-md"""!!! note "Load and organize data"
+md"""!!! note "Load and organize verb data"
 """
 
 # ╔═╡ f56ec88d-2614-416c-bf79-32176065ef95
@@ -62,6 +68,7 @@ end
 success = greekindex == englishindex
 
 # ╔═╡ 6504258f-6950-4ba1-914e-a4c7aa433be6
+"""Format appropriate markdown feedback for verb definition answer."""
 function feedback()
 	if isempty(englishopt)
 		html"""
@@ -69,6 +76,61 @@ function feedback()
 		"""
 	else
 		success ? md"✅" : md"❌"
+	end
+end
+
+# ╔═╡ 9de98a75-7b41-47e7-ab11-b9c2f555c68a
+md"""!!! note "Load and organize conjunctions and particles"
+"""
+
+# ╔═╡ e4f4327f-9b65-454b-929f-1ceeffb2d7c5
+conjfile = "vocab-conjs.csv"
+
+# ╔═╡ 8a645bf3-7aa7-4b76-85bf-f89d1390656c
+conjlist = readlines(conjfile)
+
+# ╔═╡ c138fc9e-d07d-4ce2-be3b-2123f3f33bd3
+conjpairs = split.(conjlist[2:end], ",")
+
+# ╔═╡ 0ddc8bc6-183a-4367-992e-830b327b6fd4
+conjunctions = append!([""], map(pr -> pr[1], conjpairs))
+
+# ╔═╡ 3e8928c0-4c41-4ae5-a50e-8ed0818c43c2
+conjunctionroles = append!([""], map(pr -> pr[2], conjpairs))
+
+# ╔═╡ f1b9d65c-5ef7-4e01-b725-719f9218fefc
+md"""!!! note "UI for conjunctions and particles"
+"""
+
+# ╔═╡ 57b319d6-f2f4-42f3-af52-469ac3c3cc3b
+conjbutton = @bind newconj Button("Choose a connecting word");
+
+# ╔═╡ be7cf147-b8a4-4915-9aab-0c9a557572d2
+roleselector = begin
+	newconj
+	@bind roleopt Radio(["introductory conjunction", "postpositive particle"])
+end;
+
+# ╔═╡ c4ad29c2-94c0-4137-9f9a-3cc83b6a1bb3
+conj_index = begin
+	newconj
+	rand(2:length(conjunctions))
+end
+
+# ╔═╡ 73f47c6a-744d-4776-bc0f-716013ea763b
+conj_success = begin
+	conjunctionroles[conj_index] == roleopt
+end
+
+# ╔═╡ 93e39e21-9625-498d-88f0-588a762f1cf7
+"""Format appropriate markdown for answer to connecting word function"""
+function conjfeedback()
+	if isnothing(roleopt)
+		html"""
+		<span style="color:silver;"></span>
+		"""
+	else
+		conj_success ? md"✅" : md"❌"
 	end
 end
 
@@ -94,8 +156,24 @@ md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 
 		englishselector, 			feedback()
 
 	]),
+
+	md"""## Recognizing connecting words: conjunctions and particles
+
+> When *conjunctions* introduce a clause, they are the *first word* of the clause.  > When *postpositive articles* introduce a clause, they *follow* the first logical element of the clause (and are therefore often the second word of the new clause).
+>
+> Use the `Choose a connecting word` button to randomly select a connecting word from the Module 1 vocabulary list.
+""",
+	html"""<br/><br/>""",
+	PlutoUI.ExperimentalLayout.flex([
+		conjbutton, md"**$(conjunctions[conj_index])** ",
+	]),
 	
-	
+	PlutoUI.ExperimentalLayout.flex([
+		md"""*Choose what kind of word **$(conjunctions[conj_index])** is*:""",
+		
+		roleselector, conjfeedback()
+			
+	])
 ])
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -321,11 +399,12 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─0b0f37b2-11c4-11ed-3b71-e71460f9ad67
+# ╟─1ff3e5c3-c1fa-4ec3-b5dc-a3d247db23bb
 # ╟─6b2937b1-9f46-4fbd-9253-74e5c17fb691
 # ╟─6504258f-6950-4ba1-914e-a4c7aa433be6
-# ╟─59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
-# ╟─8e175f03-1018-4c79-8f45-0eb7f088280d
-# ╟─5e1c8a46-e84b-4e3d-9f36-c9dc068af007
+# ╠═59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
+# ╠═8e175f03-1018-4c79-8f45-0eb7f088280d
+# ╠═5e1c8a46-e84b-4e3d-9f36-c9dc068af007
 # ╠═61d42adc-5347-47e8-9faf-f707f0485c7d
 # ╠═f2962f76-d187-41de-91b9-5137f6c65d51
 # ╟─50f28b04-44fc-4483-a47a-9d6cf092ce7c
@@ -333,7 +412,19 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─f56ec88d-2614-416c-bf79-32176065ef95
 # ╟─2532fc6c-5307-45cd-acdf-b67dfaeea2ca
 # ╟─19c2fe63-153d-4c53-bb19-b03cee4f139f
-# ╟─42cfd924-6af8-4c1a-b439-2b7334d8a1a9
+# ╠═42cfd924-6af8-4c1a-b439-2b7334d8a1a9
 # ╟─a39ad728-bb8e-47d4-be27-0487b6c59d93
+# ╟─9de98a75-7b41-47e7-ab11-b9c2f555c68a
+# ╟─e4f4327f-9b65-454b-929f-1ceeffb2d7c5
+# ╠═8a645bf3-7aa7-4b76-85bf-f89d1390656c
+# ╟─c138fc9e-d07d-4ce2-be3b-2123f3f33bd3
+# ╟─0ddc8bc6-183a-4367-992e-830b327b6fd4
+# ╟─3e8928c0-4c41-4ae5-a50e-8ed0818c43c2
+# ╟─f1b9d65c-5ef7-4e01-b725-719f9218fefc
+# ╠═57b319d6-f2f4-42f3-af52-469ac3c3cc3b
+# ╠═be7cf147-b8a4-4915-9aab-0c9a557572d2
+# ╟─c4ad29c2-94c0-4137-9f9a-3cc83b6a1bb3
+# ╟─93e39e21-9625-498d-88f0-588a762f1cf7
+# ╟─73f47c6a-744d-4776-bc0f-716013ea763b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
