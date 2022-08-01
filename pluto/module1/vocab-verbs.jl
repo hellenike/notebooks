@@ -22,10 +22,10 @@ md"""!!! note "UI"
 """
 
 # ╔═╡ 61d42adc-5347-47e8-9faf-f707f0485c7d
-nextbutton = @bind newrand Button("Choose verb at random");
+nextbutton = @bind newrand Button("Choose verb");
 
 # ╔═╡ 50f28b04-44fc-4483-a47a-9d6cf092ce7c
-md"""!!! note "Data"
+md"""!!! note "Load and organize data"
 """
 
 # ╔═╡ f56ec88d-2614-416c-bf79-32176065ef95
@@ -43,6 +43,9 @@ english = append!([""], map(pr -> pr[2], vocabpairs))
 # ╔═╡ f2962f76-d187-41de-91b9-5137f6c65d51
 englishselector = 	@bind englishopt confirm(Select(english));
 
+# ╔═╡ 8e175f03-1018-4c79-8f45-0eb7f088280d
+englishindex = findfirst(s -> s == englishopt, english)
+
 # ╔═╡ a39ad728-bb8e-47d4-be27-0487b6c59d93
 greek = append!([""], map(pr -> pr[1], vocabpairs))
 
@@ -52,13 +55,25 @@ greekindex = begin
 	rand(2:length(greek))
 end
 
+# ╔═╡ 59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
+success = greekindex == englishindex
+
+# ╔═╡ 6504258f-6950-4ba1-914e-a4c7aa433be6
+function feedback()
+	success ? md"✅" : md"❌"
+end
+
 # ╔═╡ 0b0f37b2-11c4-11ed-3b71-e71460f9ad67
 PlutoUI.ExperimentalLayout.Div([
 	md"""# Module 1: vocabulary practice
 
 ## Match English definition to Greek verb
-
 """,
+
+md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 vocabulary list.  Pick the best match from the list of English definitions, and then `Submit`.	
+""",
+
+	html"""<br/><br/>""",
 
 	PlutoUI.ExperimentalLayout.flex([
 	nextbutton,	md"""**$(greek[greekindex])**"""
@@ -67,7 +82,9 @@ PlutoUI.ExperimentalLayout.Div([
 	PlutoUI.ExperimentalLayout.flex([
 	md"""*Choose the best definition*""",
 		englishselector
-	])
+	]),
+	feedback()
+	
 ])
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -294,15 +311,18 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╔═╡ Cell order:
 # ╟─0b0f37b2-11c4-11ed-3b71-e71460f9ad67
 # ╟─6b2937b1-9f46-4fbd-9253-74e5c17fb691
+# ╟─6504258f-6950-4ba1-914e-a4c7aa433be6
+# ╟─59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
+# ╟─8e175f03-1018-4c79-8f45-0eb7f088280d
+# ╟─5e1c8a46-e84b-4e3d-9f36-c9dc068af007
 # ╠═61d42adc-5347-47e8-9faf-f707f0485c7d
 # ╠═f2962f76-d187-41de-91b9-5137f6c65d51
-# ╟─5e1c8a46-e84b-4e3d-9f36-c9dc068af007
 # ╟─50f28b04-44fc-4483-a47a-9d6cf092ce7c
 # ╠═405550c6-970d-4855-97c8-5b0f039f6e95
 # ╟─f56ec88d-2614-416c-bf79-32176065ef95
-# ╠═2532fc6c-5307-45cd-acdf-b67dfaeea2ca
-# ╠═19c2fe63-153d-4c53-bb19-b03cee4f139f
-# ╠═42cfd924-6af8-4c1a-b439-2b7334d8a1a9
-# ╠═a39ad728-bb8e-47d4-be27-0487b6c59d93
+# ╟─2532fc6c-5307-45cd-acdf-b67dfaeea2ca
+# ╟─19c2fe63-153d-4c53-bb19-b03cee4f139f
+# ╟─42cfd924-6af8-4c1a-b439-2b7334d8a1a9
+# ╟─a39ad728-bb8e-47d4-be27-0487b6c59d93
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
