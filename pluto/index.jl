@@ -16,6 +16,8 @@ md"""
 
 
 - [identify verb forms](./module1/verbid?isolated_cell_id=ff634376-102a-11ed-375a-a1bb22719a13)
+- vocabulary
+    - [verbs](./module/vocab-verbs) (link to raw notebook)
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
