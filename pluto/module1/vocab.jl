@@ -17,18 +17,9 @@ end
 # ╔═╡ 405550c6-970d-4855-97c8-5b0f039f6e95
 using PlutoUI
 
-# ╔═╡ 1ff3e5c3-c1fa-4ec3-b5dc-a3d247db23bb
-html"""
-
-<br/><br/><br/>
-"""
-
 # ╔═╡ 6b2937b1-9f46-4fbd-9253-74e5c17fb691
 md"""!!! note "UI for verb forms"
 """
-
-# ╔═╡ 61d42adc-5347-47e8-9faf-f707f0485c7d
-nextbutton = @bind newrand Button("Choose verb");
 
 # ╔═╡ 50f28b04-44fc-4483-a47a-9d6cf092ce7c
 md"""!!! note "Load and organize verb data"
@@ -48,7 +39,6 @@ english = append!([""], map(pr -> pr[2], vocabpairs))
 
 # ╔═╡ f2962f76-d187-41de-91b9-5137f6c65d51
 englishselector = 	begin
-	newrand
 	@bind englishopt Select(english, default = "")
 end;
 
@@ -58,14 +48,28 @@ englishindex = findfirst(s -> s == englishopt, english)
 # ╔═╡ a39ad728-bb8e-47d4-be27-0487b6c59d93
 greek = append!([""], map(pr -> pr[1], vocabpairs))
 
-# ╔═╡ 5e1c8a46-e84b-4e3d-9f36-c9dc068af007
-greekindex = begin
-	newrand
-	rand(2:length(greek))
-end
+# ╔═╡ 6a152a68-1d07-423d-bf6f-cb3f38f852d9
+qslider = @bind questionindex Slider(2:length(greek), show_value=true);
+
+# ╔═╡ 75cd2828-75c4-420d-8078-55ad53c5a1ab
+PlutoUI.ExperimentalLayout.Div([
+	md"""# Module 1: vocabulary practice
+
+## Match English definition to Greek verb
+""",
+
+md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 vocabulary list, then pick the best match from the list of English definitions.
+""",
+
+	
+	PlutoUI.ExperimentalLayout.flex([
+		md"Choose a vocab item: ",
+	qslider
+	]),
+])
 
 # ╔═╡ 59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
-success = greekindex == englishindex
+success = questionindex == englishindex
 
 # ╔═╡ 6504258f-6950-4ba1-914e-a4c7aa433be6
 """Format appropriate markdown feedback for verb definition answer."""
@@ -79,24 +83,45 @@ function feedback()
 	end
 end
 
+# ╔═╡ 0b0f37b2-11c4-11ed-3b71-e71460f9ad67
+PlutoUI.ExperimentalLayout.Div([
+	PlutoUI.ExperimentalLayout.flex([
+	md"""**$(greek[questionindex])**  """,
+
+	]),
+
+	PlutoUI.ExperimentalLayout.flex([
+			
+		englishselector, 			
+		feedback()
+
+	])
+
+])
+
+# ╔═╡ 5e1c8a46-e84b-4e3d-9f36-c9dc068af007
+greekindex = begin
+	rand(2:length(greek))
+end
+
 # ╔═╡ 9de98a75-7b41-47e7-ab11-b9c2f555c68a
 md"""!!! note "Load and organize conjunctions and particles"
 """
 
 # ╔═╡ e4f4327f-9b65-454b-929f-1ceeffb2d7c5
-conjfile = "vocab-conjs.csv"
+conjfile = "vocab-conjs.csv";
 
 # ╔═╡ 8a645bf3-7aa7-4b76-85bf-f89d1390656c
-conjlist = readlines(conjfile)
+conjlist = readlines(conjfile);
 
 # ╔═╡ c138fc9e-d07d-4ce2-be3b-2123f3f33bd3
-conjpairs = split.(conjlist[2:end], ",")
+conjpairs = split.(conjlist[2:end], ",");
 
 # ╔═╡ 0ddc8bc6-183a-4367-992e-830b327b6fd4
-conjunctions = append!([""], map(pr -> pr[1], conjpairs))
+conjunctions = append!([""], map(pr -> pr[1], conjpairs));
 
 # ╔═╡ 3e8928c0-4c41-4ae5-a50e-8ed0818c43c2
-conjunctionroles = append!([""], map(pr -> pr[2], conjpairs))
+conjunctionroles = append!([""], map(pr -> pr[2], conjpairs));
 
 # ╔═╡ f1b9d65c-5ef7-4e01-b725-719f9218fefc
 md"""!!! note "UI for conjunctions and particles"
@@ -134,28 +159,7 @@ function conjfeedback()
 	end
 end
 
-# ╔═╡ 0b0f37b2-11c4-11ed-3b71-e71460f9ad67
-PlutoUI.ExperimentalLayout.Div([
-	md"""# Module 1: vocabulary practice
-
-## Match English definition to Greek verb
-""",
-
-md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 vocabulary list, then pick the best match from the list of English definitions.
-""",
-
-	html"""<br/><br/>""",
-
-	PlutoUI.ExperimentalLayout.flex([
-	nextbutton,	md"""**$(greek[greekindex])**  """,
-
-	]),
-
-	PlutoUI.ExperimentalLayout.flex([
-			
-		englishselector, 			feedback()
-
-	]),
+# ╔═╡ aae0ca83-71f6-4caf-ab03-dade1e27a0f1
 
 	md"""## Recognizing connecting words: conjunctions and particles
 
@@ -174,7 +178,6 @@ md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 
 		roleselector, conjfeedback()
 			
 	])
-])
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -189,7 +192,7 @@ PlutoUI = "~0.7.39"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.2"
+julia_version = "1.7.3"
 manifest_format = "2.0"
 
 [[deps.AbstractPlutoDingetjes]]
@@ -222,8 +225,11 @@ deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
 [[deps.Downloads]]
-deps = ["ArgTools", "LibCURL", "NetworkOptions"]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -398,14 +404,14 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 """
 
 # ╔═╡ Cell order:
+# ╟─75cd2828-75c4-420d-8078-55ad53c5a1ab
 # ╟─0b0f37b2-11c4-11ed-3b71-e71460f9ad67
-# ╟─1ff3e5c3-c1fa-4ec3-b5dc-a3d247db23bb
+# ╟─6a152a68-1d07-423d-bf6f-cb3f38f852d9
 # ╟─6b2937b1-9f46-4fbd-9253-74e5c17fb691
 # ╟─6504258f-6950-4ba1-914e-a4c7aa433be6
 # ╠═59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
 # ╠═8e175f03-1018-4c79-8f45-0eb7f088280d
 # ╠═5e1c8a46-e84b-4e3d-9f36-c9dc068af007
-# ╠═61d42adc-5347-47e8-9faf-f707f0485c7d
 # ╠═f2962f76-d187-41de-91b9-5137f6c65d51
 # ╟─50f28b04-44fc-4483-a47a-9d6cf092ce7c
 # ╠═405550c6-970d-4855-97c8-5b0f039f6e95
@@ -414,12 +420,13 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─19c2fe63-153d-4c53-bb19-b03cee4f139f
 # ╠═42cfd924-6af8-4c1a-b439-2b7334d8a1a9
 # ╟─a39ad728-bb8e-47d4-be27-0487b6c59d93
+# ╟─aae0ca83-71f6-4caf-ab03-dade1e27a0f1
 # ╟─9de98a75-7b41-47e7-ab11-b9c2f555c68a
-# ╟─e4f4327f-9b65-454b-929f-1ceeffb2d7c5
+# ╠═e4f4327f-9b65-454b-929f-1ceeffb2d7c5
 # ╠═8a645bf3-7aa7-4b76-85bf-f89d1390656c
-# ╟─c138fc9e-d07d-4ce2-be3b-2123f3f33bd3
+# ╠═c138fc9e-d07d-4ce2-be3b-2123f3f33bd3
 # ╟─0ddc8bc6-183a-4367-992e-830b327b6fd4
-# ╟─3e8928c0-4c41-4ae5-a50e-8ed0818c43c2
+# ╠═3e8928c0-4c41-4ae5-a50e-8ed0818c43c2
 # ╟─f1b9d65c-5ef7-4e01-b725-719f9218fefc
 # ╠═57b319d6-f2f4-42f3-af52-469ac3c3cc3b
 # ╠═be7cf147-b8a4-4915-9aab-0c9a557572d2
