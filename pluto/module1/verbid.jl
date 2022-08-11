@@ -18,35 +18,27 @@ end
 begin
 	using PlutoUI
 	using Unicode
-
+	using Markdown
 	md"""*Unhide this cell to see or modify your Julia environment*."""
-end
+end;
 
-# ╔═╡ b07160b0-fcff-45e6-a5d9-2a8b8ea3dfc9
-html"""
-<br/><br/><br/>
-"""
+# ╔═╡ 7bd9b46a-7036-4320-a380-74c9b292b34a
+		md"""# Module 1: identifying verb forms
 
-# ╔═╡ 9242e13a-0bd3-4529-a0b9-ffbbdcc70509
-md"""!!! note "Interface widgets"
-"""
-
-# ╔═╡ 46eeacf0-6b01-4a29-9919-000eb7a597b8
-newbutton = @bind newverb Button("Choose a verb");
+> Choose the number of a question from the following list 
+>, then fully identify its form with person, number, tense, mood and voice (`pntmv`)"""
 
 # ╔═╡ 39cce03d-5ad5-4805-8311-5109f8f224b7
 personselector = @bind person Select(["third"]);
 
 # ╔═╡ a1a83933-f993-490e-8f6e-b8ac2b26cc84
 numselector = begin
-	newverb
 	@bind num Select(["", "singular", "plural"])
 end;
 
 
 # ╔═╡ d6d27127-d52d-4fae-a832-5b09c6af6669
 tenseselector = begin
-	newverb
 	@bind tense Select(["", "aorist", "imperfect"]);
 end;
 
@@ -55,47 +47,55 @@ moodselector = @bind mood Select(["indicative"]);
 
 # ╔═╡ b3c9f963-bc54-4dcf-aa8a-e66f7894fe75
 voiceselector = begin
-	newverb
 	@bind voice Select(["", "active", "middle or passive", "middle", "passive", ])
 end;
+
+# ╔═╡ 2f25dd81-6f31-401a-a926-620b7aa490fb
+verbdata = readlines("verbforms.csv")[2:end];
+
+# ╔═╡ d6ce2442-6e17-4975-930f-6a0575b23ae2
+qslider = @bind questionidx Slider(0:length(verbdata), show_value=true);
+
+# ╔═╡ 47215125-dda9-47f3-9f57-006a077e862e
+	PlutoUI.ExperimentalLayout.flex([
+			md"Choose a question by number: ",
+			qslider
+		])
 
 # ╔═╡ d9e59d74-58df-4438-8459-60eba2371ccc
 """Compose markdown prompt on incomplete entry"""
 function promptreply()
-	if isempty(num) || isempty(tense) || isempty(voice)
+	if questionidx == 0
+			html"""
+		<span style="color:silver;">Choose a question</span>"""
+
+	elseif isempty(num) || isempty(tense) || isempty(voice)
+		
 		html"""
 		<span style="color:silver;">Choose person, number, tense, mood and voice</span>
 		"""
 	else
 		md""
 	end
-end
-
-# ╔═╡ 749af000-c8ee-49e2-b228-6a83be13e1dc
-md"""!!! note "Data"
-"""
-
-# ╔═╡ 2f25dd81-6f31-401a-a926-620b7aa490fb
-verbdata = readlines("verbforms.csv")[2:end]
+end;
 
 # ╔═╡ 59caea6d-761a-40e3-a6a8-c9f1fbd9a32e
-datatable = split.(verbdata, ",")
+datatable = split.(verbdata, ",");
 
 # ╔═╡ 041c6946-f2d9-423b-a9a3-8e19d90a3771
 verbchoices = map(verbdata) do row
 	split(row,",")[1]
-end
+end;
 
 # ╔═╡ 1dbb1728-2610-40fd-9a4f-1e4b536c4da0
 verb = begin
-	newverb
-	rand(verbchoices)
-end
+	questionidx == 0 ? "" : verbchoices[questionidx]
+end;
 
 # ╔═╡ 6c3344d5-235b-4fad-982d-049833da6f04
 """Compose markdown reply to user entry"""
 function evalreply()
-	if isempty(num) || isempty(tense) || isempty(voice)
+	if questionidx == 0 || isempty(num) || isempty(tense) || isempty(voice)
 		md""
 	else
 		answeridx = findfirst(cols -> cols[1] == verb, datatable)
@@ -108,20 +108,15 @@ function evalreply()
 
 		success ? md"✅" : md"❌"
 	end
-end
+end;
 
 # ╔═╡ ff634376-102a-11ed-375a-a1bb22719a13
 begin
 	PlutoUI.ExperimentalLayout.Div([
-		md"""# Identifying verb forms
-
-> Use the `Choose a verb` button to select a verb form at random from vocabularyin Module 1, then fully identify its form with person, number, tense, mood and voice (`pntmv`)""",
-		html"""
-		<br/>
-		""",
-
+	
+		
 		PlutoUI.ExperimentalLayout.flex([
-			newbutton, 
+	
 			md"**$(verb)**"
 		]),
 		
@@ -135,9 +130,18 @@ end
 
 
 
+# ╔═╡ 31919be5-f95f-4624-9389-1743c5dd4551
+qlist = map(verbchoices) do v
+	"1. Identify the form of **$(v)**."
+end;
+
+# ╔═╡ 7066daa8-758f-4467-b2b5-c267809bd177
+Markdown.parse(join(qlist, "\n"))
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
@@ -149,7 +153,7 @@ PlutoUI = "~0.7.39"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.2"
+julia_version = "1.7.3"
 manifest_format = "2.0"
 
 [[deps.AbstractPlutoDingetjes]]
@@ -182,8 +186,11 @@ deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
 [[deps.Downloads]]
-deps = ["ArgTools", "LibCURL", "NetworkOptions"]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -358,19 +365,20 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 """
 
 # ╔═╡ Cell order:
+# ╟─7bd9b46a-7036-4320-a380-74c9b292b34a
+# ╟─47215125-dda9-47f3-9f57-006a077e862e
+# ╟─7066daa8-758f-4467-b2b5-c267809bd177
 # ╟─ff634376-102a-11ed-375a-a1bb22719a13
-# ╟─b07160b0-fcff-45e6-a5d9-2a8b8ea3dfc9
-# ╟─9242e13a-0bd3-4529-a0b9-ffbbdcc70509
-# ╠═46eeacf0-6b01-4a29-9919-000eb7a597b8
-# ╟─1dbb1728-2610-40fd-9a4f-1e4b536c4da0
-# ╟─6c3344d5-235b-4fad-982d-049833da6f04
 # ╟─d9e59d74-58df-4438-8459-60eba2371ccc
-# ╠═39cce03d-5ad5-4805-8311-5109f8f224b7
-# ╠═a1a83933-f993-490e-8f6e-b8ac2b26cc84
-# ╠═d6d27127-d52d-4fae-a832-5b09c6af6669
-# ╠═ede332a2-34c8-4481-8206-d92a60e4cea0
-# ╠═b3c9f963-bc54-4dcf-aa8a-e66f7894fe75
-# ╟─749af000-c8ee-49e2-b228-6a83be13e1dc
+# ╟─d6ce2442-6e17-4975-930f-6a0575b23ae2
+# ╟─1dbb1728-2610-40fd-9a4f-1e4b536c4da0
+# ╟─31919be5-f95f-4624-9389-1743c5dd4551
+# ╟─6c3344d5-235b-4fad-982d-049833da6f04
+# ╟─39cce03d-5ad5-4805-8311-5109f8f224b7
+# ╟─a1a83933-f993-490e-8f6e-b8ac2b26cc84
+# ╟─d6d27127-d52d-4fae-a832-5b09c6af6669
+# ╟─ede332a2-34c8-4481-8206-d92a60e4cea0
+# ╟─b3c9f963-bc54-4dcf-aa8a-e66f7894fe75
 # ╟─2f25dd81-6f31-401a-a926-620b7aa490fb
 # ╟─59caea6d-761a-40e3-a6a8-c9f1fbd9a32e
 # ╟─041c6946-f2d9-423b-a9a3-8e19d90a3771
