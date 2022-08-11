@@ -45,6 +45,20 @@ end;
 # ╔═╡ 8e175f03-1018-4c79-8f45-0eb7f088280d
 englishindex = findfirst(s -> s == englishopt, english)
 
+# ╔═╡ bd773c9c-176f-49d1-b393-a29acb19cddd
+englishgreekdict = Dict();
+
+# ╔═╡ 4fd2d34a-db51-4693-b755-706971eb2544
+vocabpairs
+
+# ╔═╡ b51e5bf6-24ad-4bab-b1b6-76895b1245aa
+for pr in vocabpairs
+	englishgreekdict[pr[2]] = pr[1]
+end;
+
+# ╔═╡ c3637a4f-d5b9-4889-a45e-f57f4fc73159
+englishgreekdict
+
 # ╔═╡ a39ad728-bb8e-47d4-be27-0487b6c59d93
 greek = append!([""], map(pr -> pr[1], vocabpairs))
 
@@ -69,7 +83,7 @@ md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 
 ])
 
 # ╔═╡ 59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
-success = questionindex == englishindex
+success = englishgreekdict[englishopt]  == greek[questionindex]
 
 # ╔═╡ 6504258f-6950-4ba1-914e-a4c7aa433be6
 """Format appropriate markdown feedback for verb definition answer."""
@@ -81,7 +95,7 @@ function feedback()
 	else
 		success ? md"✅" : md"❌"
 	end
-end
+end;
 
 # ╔═╡ 0b0f37b2-11c4-11ed-3b71-e71460f9ad67
 PlutoUI.ExperimentalLayout.Div([
@@ -414,11 +428,15 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═5e1c8a46-e84b-4e3d-9f36-c9dc068af007
 # ╠═f2962f76-d187-41de-91b9-5137f6c65d51
 # ╟─50f28b04-44fc-4483-a47a-9d6cf092ce7c
-# ╠═405550c6-970d-4855-97c8-5b0f039f6e95
+# ╟─405550c6-970d-4855-97c8-5b0f039f6e95
 # ╟─f56ec88d-2614-416c-bf79-32176065ef95
 # ╟─2532fc6c-5307-45cd-acdf-b67dfaeea2ca
 # ╟─19c2fe63-153d-4c53-bb19-b03cee4f139f
 # ╠═42cfd924-6af8-4c1a-b439-2b7334d8a1a9
+# ╟─bd773c9c-176f-49d1-b393-a29acb19cddd
+# ╠═4fd2d34a-db51-4693-b755-706971eb2544
+# ╟─b51e5bf6-24ad-4bab-b1b6-76895b1245aa
+# ╠═c3637a4f-d5b9-4889-a45e-f57f4fc73159
 # ╟─a39ad728-bb8e-47d4-be27-0487b6c59d93
 # ╟─aae0ca83-71f6-4caf-ab03-dade1e27a0f1
 # ╟─9de98a75-7b41-47e7-ab11-b9c2f555c68a
