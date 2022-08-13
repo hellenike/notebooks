@@ -28,6 +28,20 @@ end;
 > Choose the number of a question from the following list 
 >, then fully identify its form with person, number, tense, mood and voice (`pntmv`)"""
 
+# ╔═╡ 953f9b92-4cb2-4234-b0da-b2436b5492e8
+md"""$br $br $br
+
+
+!!! note "Hidden cells"
+
+    *Unhide cells below this one if you want to see how this notebook works*.
+
+
+"""
+
+# ╔═╡ 6183b75a-710c-4b62-bd05-f9e89e93c634
+princpartbox = @bind seeprincpart CheckBox();
+
 # ╔═╡ 39cce03d-5ad5-4805-8311-5109f8f224b7
 personselector = @bind person Select(["third"]);
 
@@ -49,6 +63,27 @@ moodselector = @bind mood Select(["indicative"]);
 voiceselector = begin
 	@bind voice Select(["", "active", "middle or passive", "middle", "passive", ])
 end;
+
+# ╔═╡ bd84476e-ef31-48be-bbdc-2f2151f05252
+function princpart()
+	if seeprincpart 
+		if tense == "imperfect"
+			md" **first**" 
+		else
+			voice == "passive" ? md" **sixth**"  : md" **third**"
+		end
+	else 
+		md""
+	end
+end;
+
+# ╔═╡ f8d9da68-ef2f-4e5f-9c73-8d7d0486866b
+PlutoUI.ExperimentalLayout.flex([
+	princpartbox,
+	md"*show principal part*",
+	princpart()
+])
+
 
 # ╔═╡ 2f25dd81-6f31-401a-a926-620b7aa490fb
 verbdata = readlines("verbforms.csv")[2:end];
@@ -369,6 +404,10 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─47215125-dda9-47f3-9f57-006a077e862e
 # ╟─7066daa8-758f-4467-b2b5-c267809bd177
 # ╟─ff634376-102a-11ed-375a-a1bb22719a13
+# ╟─f8d9da68-ef2f-4e5f-9c73-8d7d0486866b
+# ╟─953f9b92-4cb2-4234-b0da-b2436b5492e8
+# ╟─6183b75a-710c-4b62-bd05-f9e89e93c634
+# ╟─bd84476e-ef31-48be-bbdc-2f2151f05252
 # ╟─d9e59d74-58df-4438-8459-60eba2371ccc
 # ╟─d6ce2442-6e17-4975-930f-6a0575b23ae2
 # ╟─1dbb1728-2610-40fd-9a4f-1e4b536c4da0
