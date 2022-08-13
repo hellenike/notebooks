@@ -15,27 +15,30 @@ macro bind(def, element)
 end
 
 # ╔═╡ 405550c6-970d-4855-97c8-5b0f039f6e95
-using PlutoUI
-
-# ╔═╡ 6b2937b1-9f46-4fbd-9253-74e5c17fb691
-md"""!!! note "UI for verb forms"
-"""
-
-# ╔═╡ 50f28b04-44fc-4483-a47a-9d6cf092ce7c
-md"""!!! note "Load and organize verb data"
-"""
+begin
+	using PlutoUI
+	using Random
+end
 
 # ╔═╡ f56ec88d-2614-416c-bf79-32176065ef95
-f = "vocab-verbs.cex"
+f = "vocab-verbs.cex";
 
 # ╔═╡ 2532fc6c-5307-45cd-acdf-b67dfaeea2ca
-datalines = 	split.(readlines(f)[2:end], "|")
+datalines = 	split.(readlines(f)[2:end], "|");
 
 # ╔═╡ 19c2fe63-153d-4c53-bb19-b03cee4f139f
-vocabpairs = sort(map(cols -> (cols[1], cols[end]), datalines), by = pr -> pr[2])
+vocabpairs = sort(map(cols -> (cols[1], cols[end]), datalines), by = pr -> pr[2]);
+
+# ╔═╡ bd773c9c-176f-49d1-b393-a29acb19cddd
+englishgreekdict = Dict();
+
+# ╔═╡ b51e5bf6-24ad-4bab-b1b6-76895b1245aa
+for pr in vocabpairs
+	englishgreekdict[pr[2]] = pr[1]
+end;
 
 # ╔═╡ 42cfd924-6af8-4c1a-b439-2b7334d8a1a9
-english = append!([""], map(pr -> pr[2], vocabpairs))
+english = append!([""], shuffle(map(pr -> pr[2], vocabpairs)));
 
 # ╔═╡ f2962f76-d187-41de-91b9-5137f6c65d51
 englishselector = 	begin
@@ -43,27 +46,16 @@ englishselector = 	begin
 end;
 
 # ╔═╡ 8e175f03-1018-4c79-8f45-0eb7f088280d
-englishindex = findfirst(s -> s == englishopt, english)
-
-# ╔═╡ bd773c9c-176f-49d1-b393-a29acb19cddd
-englishgreekdict = Dict();
-
-# ╔═╡ 4fd2d34a-db51-4693-b755-706971eb2544
-vocabpairs
-
-# ╔═╡ b51e5bf6-24ad-4bab-b1b6-76895b1245aa
-for pr in vocabpairs
-	englishgreekdict[pr[2]] = pr[1]
-end;
-
-# ╔═╡ c3637a4f-d5b9-4889-a45e-f57f4fc73159
-englishgreekdict
+englishindex = findfirst(s -> s == englishopt, english);
 
 # ╔═╡ a39ad728-bb8e-47d4-be27-0487b6c59d93
-greek = append!([""], map(pr -> pr[1], vocabpairs))
+greek = map(pr -> pr[1], vocabpairs);
+
+# ╔═╡ 7d7d437c-0d4f-4f17-afd3-a5776fad78ad
+Markdown.parse(join(map(w -> string("1. ", w), greek),"\n"))
 
 # ╔═╡ 6a152a68-1d07-423d-bf6f-cb3f38f852d9
-qslider = @bind questionindex Slider(2:length(greek), show_value=true);
+qslider = @bind questionindex Slider(1:length(greek), show_value=true);
 
 # ╔═╡ 75cd2828-75c4-420d-8078-55ad53c5a1ab
 PlutoUI.ExperimentalLayout.Div([
@@ -72,18 +64,18 @@ PlutoUI.ExperimentalLayout.Div([
 ## Match English definition to Greek verb
 """,
 
-md"""> Use the `Choose verb` button to randomly select a verb from the Module 1 vocabulary list, then pick the best match from the list of English definitions.
+md"""> Choose a verb from the Module 1 vocabulary list, then pick the best match from the list of English definitions.
 """,
 
 	
 	PlutoUI.ExperimentalLayout.flex([
-		md"Choose a vocab item: ",
+		md"*Choose a vocabulary item by number*: ",
 	qslider
 	]),
 ])
 
 # ╔═╡ 59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
-success = englishgreekdict[englishopt]  == greek[questionindex]
+success = isempty(englishopt) ? false : englishgreekdict[englishopt]  == greek[questionindex] ;
 
 # ╔═╡ 6504258f-6950-4ba1-914e-a4c7aa433be6
 """Format appropriate markdown feedback for verb definition answer."""
@@ -113,10 +105,8 @@ PlutoUI.ExperimentalLayout.Div([
 
 ])
 
-# ╔═╡ 5e1c8a46-e84b-4e3d-9f36-c9dc068af007
-greekindex = begin
-	rand(2:length(greek))
-end
+# ╔═╡ 18cac7b6-de30-4762-a1a2-2a85d95ceead
+greekmenu = append!([""], greek);
 
 # ╔═╡ 9de98a75-7b41-47e7-ab11-b9c2f555c68a
 md"""!!! note "Load and organize conjunctions and particles"
@@ -197,6 +187,7 @@ end
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
 PlutoUI = "~0.7.39"
@@ -419,31 +410,28 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─75cd2828-75c4-420d-8078-55ad53c5a1ab
+# ╟─7d7d437c-0d4f-4f17-afd3-a5776fad78ad
 # ╟─0b0f37b2-11c4-11ed-3b71-e71460f9ad67
 # ╟─6a152a68-1d07-423d-bf6f-cb3f38f852d9
-# ╟─6b2937b1-9f46-4fbd-9253-74e5c17fb691
 # ╟─6504258f-6950-4ba1-914e-a4c7aa433be6
-# ╠═59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
-# ╠═8e175f03-1018-4c79-8f45-0eb7f088280d
-# ╠═5e1c8a46-e84b-4e3d-9f36-c9dc068af007
-# ╠═f2962f76-d187-41de-91b9-5137f6c65d51
-# ╟─50f28b04-44fc-4483-a47a-9d6cf092ce7c
+# ╟─59f9afa9-52cb-4dac-a6e5-2ce36d2dcd06
+# ╟─8e175f03-1018-4c79-8f45-0eb7f088280d
+# ╟─f2962f76-d187-41de-91b9-5137f6c65d51
 # ╟─405550c6-970d-4855-97c8-5b0f039f6e95
 # ╟─f56ec88d-2614-416c-bf79-32176065ef95
 # ╟─2532fc6c-5307-45cd-acdf-b67dfaeea2ca
 # ╟─19c2fe63-153d-4c53-bb19-b03cee4f139f
-# ╠═42cfd924-6af8-4c1a-b439-2b7334d8a1a9
 # ╟─bd773c9c-176f-49d1-b393-a29acb19cddd
-# ╠═4fd2d34a-db51-4693-b755-706971eb2544
 # ╟─b51e5bf6-24ad-4bab-b1b6-76895b1245aa
-# ╠═c3637a4f-d5b9-4889-a45e-f57f4fc73159
+# ╟─42cfd924-6af8-4c1a-b439-2b7334d8a1a9
 # ╟─a39ad728-bb8e-47d4-be27-0487b6c59d93
+# ╟─18cac7b6-de30-4762-a1a2-2a85d95ceead
 # ╟─aae0ca83-71f6-4caf-ab03-dade1e27a0f1
 # ╟─9de98a75-7b41-47e7-ab11-b9c2f555c68a
 # ╠═e4f4327f-9b65-454b-929f-1ceeffb2d7c5
 # ╠═8a645bf3-7aa7-4b76-85bf-f89d1390656c
 # ╠═c138fc9e-d07d-4ce2-be3b-2123f3f33bd3
-# ╟─0ddc8bc6-183a-4367-992e-830b327b6fd4
+# ╠═0ddc8bc6-183a-4367-992e-830b327b6fd4
 # ╠═3e8928c0-4c41-4ae5-a50e-8ed0818c43c2
 # ╟─f1b9d65c-5ef7-4e01-b725-719f9218fefc
 # ╠═57b319d6-f2f4-42f3-af52-469ac3c3cc3b
